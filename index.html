@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>web</title>
+    <script src="jquery-3.0.0.min.js"></script>
+    <script src="node_modules/socket.io-client/socket.io.js"></script>
+    <style>
+        #d1 div {
+            margin: 5px
+        }
+        
+        #d1 {
+            width: 231px;
+            margin: 5px auto;
+            border: 1px solid #000;
+            background: #eee
+        }
+        
+        #d1_3 input {
+            width: 68px;
+        }
+        
+        #zt {
+            width: 168px
+        }
+        
+        #nr {
+            width: 167px;
+            height: 80px;
+            resize: none;
+            vertical-align: top
+        }
+    </style>
+</head>
+
+
+<body>
+    <div id="d1">
+        <div>
+            主题：<input type="text" id="zt">
+        </div>
+        <div>
+            内容：<textarea id="nr"></textarea>
+        </div>
+        <div id="d1_3">
+            <input type="button" id="fa" value="发&nbsp布">
+            <input type="button" id="ding" value="订&nbsp阅">
+            <input type="button" id="qu" value="取消订阅" disabled>
+        </div>
+    </div>
+    <script type="text/javascript">
+       var socket=io.connect();
+       $('#fa').click(function(){
+            var z=$('#zt').val();
+            var n=$('#nr').val();
+            if(z!==''&&n!==''){
+                socket.emit('fabu',{zt:z,nr:n});
+            }else{
+                alert('主题或内容不能为空')
+            }
+            
+       });
+       $('#ding').click(function(){
+           var z=$('#zt').val();    
+           if(z!==''){
+                $('#nr').val('');
+                socket.emit('ding',z);
+                socket.on('dingyue',function(data){
+                    $('#nr').val(data); 
+                });
+                this.disabled=true;
+                $('#fa').attr('disabled', true);
+                $('#qu').removeAttr('disabled');
+           }else{
+                alert('主题不能为空');
+           }      
+        });
+        $('#qu').click(function(){
+            $('#nr').val('');
+            this.disabled=true;
+            $('#fa').removeAttr('disabled');
+            $('#ding').removeAttr('disabled');
+            socket.emit('quxiao',$('#zt').val());
+        });
+    </script>
+</body>
+
+</html>
